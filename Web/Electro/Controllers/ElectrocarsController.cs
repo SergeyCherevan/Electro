@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Electro.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Electro.Controllers
 {
@@ -13,10 +14,12 @@ namespace Electro.Controllers
     [ApiController]
     public class ElectrocarsController : ControllerBase
     {
+        private readonly UserManager<User> _manager;
         private readonly ElectroDbContext _context;
 
-        public ElectrocarsController(ElectroDbContext context)
+        public ElectrocarsController(UserManager<User> userMgr, ElectroDbContext context)
         {
+            _manager = userMgr;
             _context = context;
         }
 
@@ -77,6 +80,10 @@ namespace Electro.Controllers
         [HttpPost]
         public async Task<ActionResult<Electrocar>> PostElectrocar(Electrocar electrocar)
         {
+            User user = await _manager.FindByNameAsync(User.Identity.Name);
+
+            electrocar.OwnerId = user.Id;
+
             _context.Electrocars.Add(electrocar);
             try
             {
