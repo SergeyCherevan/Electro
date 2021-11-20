@@ -25,9 +25,11 @@ namespace Electro.Controllers
 
         // GET: api/Electrocars
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Electrocar>>> GetElectrocars()
+        public async Task<ActionResult> GetElectrocars()
         {
-            return await _context.Electrocars.ToListAsync();
+            User user = await _manager.FindByNameAsync(User.Identity.Name);
+
+            return Ok(_context.Electrocars.Where(e => e.OwnerId == user.Id));
         }
 
         // GET: api/Electrocars/5
